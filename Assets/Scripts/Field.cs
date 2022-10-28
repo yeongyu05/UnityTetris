@@ -5,31 +5,44 @@ using UnityEngine;
 public class Field : MonoBehaviour
 {
     public GameObject blockPrefab;
-    public float timer = 0f;
-    public float interval = 1f;
+    public float timer = 0;
+    public float interval = 1;
 
     private new Transform transform;
     private Vector2Int blockCount;
 
     private Bounds bounds;
     private Bounds blockBounds;
-    private bool[,] grid;
+    private GameObject[,] grid;
+
+    private int x = 4;
+    private int y = 21;
+
+    Block currentBlock;
 
 
     void Start()
     {
-        blockCount = new Vector2Int(10, 20);
-        grid = new bool[blockCount.x, blockCount.y];
+        TileRender();
+
+        currentBlock = CreateBlock(x, y);
+    }
+
+    void TileRender()
+    {
+        blockCount = new Vector2Int(10, 24);
+        grid = new GameObject[blockCount.x, blockCount.y];
         bounds = GetComponent<SpriteRenderer>().bounds;
         blockBounds = new Bounds(
             center: Vector2.zero,
             size: new Vector3(bounds.size.x / blockCount.x, bounds.size.y / blockCount.y)
         );
 
-        InitGrid();
+        CreateBoard();
+        CreateBlock(x, y);
     }
 
-    void InitGrid()
+    void CreateBoard()
     {
         Vector2 startPosition = bounds.min + new Vector3(blockBounds.extents.x, blockBounds.extents.y, 0f);
         Vector2 position = startPosition;
@@ -40,13 +53,14 @@ public class Field : MonoBehaviour
             for (int x = 0; x < blockCount.x; x++)
             {
                 // 블럭 하나하나 처리
-                grid[x, y] = false;
-
                 GameObject block = Instantiate(blockPrefab, position, Quaternion.identity, transform);
                 block.GetComponent<SpriteRenderer>().bounds = new Bounds(
                     center: position,
                     size: blockBounds.size
                 );
+                block.SetActive(false);
+
+                grid[x, y] = block;
 
                 position.x += blockBounds.size.x;
             }
@@ -56,16 +70,55 @@ public class Field : MonoBehaviour
         }
     }
 
+    Block CreateBlock(int column, int row)
+    {
+        Block newBlock = new Block();
+        newBlock.Column = column;
+        newBlock.Row = row;
+        newBlock.Shape = newBlock.I;
+
+        RenderBlock(newBlock);
+
+        return newBlock;
+    }
+
+    void RenderBlock(Block block)
+    {
+        int blockY = 0;
+
+        for (int y = block.Row - 1; y < block.Row + 3; y++)
+        {
+            int blockX = 0;
+
+            for (int x = block.Column - 1; x < block.Column + 3; x++)
+            {
+                if (block.Shape[blockX, blockY])
+                {
+                    grid[x, y].SetActive(true);
+                }
+
+                blockX++;
+            }
+
+            blockY++;
+        }
+    }
+
+    void ClearField(Block block)
+    {
+        
+    }
+
     private void Update()
     {
-        // Object의 이름을 찾음. 가장 처음에 나오는 Object를 반환.
-        // GameObject obj1 = transform.Find("Block").gameObject;
-        // 자식을 번호로 찾음. 0번째가 첫 번째 자식
-        // GameObject obj2 = transform.GetChild(0).gameObject;
         timer += Time.deltaTime;
-        if(timer >= Time.deltaTime)
+        if(timer >= interval)
         {
-            Debug.Log("test");
+            ClearField(currentBlock);
+            currentBlock.Row--;
+
+            RenderBlock(currentBlock);
+
             timer = 0;
         }
     }
