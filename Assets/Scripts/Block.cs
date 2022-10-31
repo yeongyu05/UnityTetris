@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Block : MonoBehaviour
+public class Block
 {
     public bool[,] blocks = new bool[4, 4] {
         { true, true, true, true },

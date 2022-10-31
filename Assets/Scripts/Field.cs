@@ -14,6 +14,7 @@ public class Field : MonoBehaviour
     private Bounds bounds;
     private Bounds blockBounds;
     private GameObject[,] grid;
+    private bool[,] temp = new bool [4, 4];
 
     private int x = 4;
     private int y = 21;
@@ -77,12 +78,12 @@ public class Field : MonoBehaviour
         newBlock.Row = row;
         newBlock.Shape = newBlock.I;
 
-        RenderBlock(newBlock);
+        ToggleGridActive(newBlock, true);
 
         return newBlock;
     }
 
-    void RenderBlock(Block block)
+    void ToggleGridActive(Block block, bool active)
     {
         int blockY = 0;
 
@@ -94,7 +95,7 @@ public class Field : MonoBehaviour
             {
                 if (block.Shape[blockX, blockY])
                 {
-                    grid[x, y].SetActive(true);
+                    grid[x, y].SetActive(active);
                 }
 
                 blockX++;
@@ -104,22 +105,69 @@ public class Field : MonoBehaviour
         }
     }
 
-    void ClearField(Block block)
+    void RotateGrid(Block block)
     {
-        
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                temp[i, j] = block.Shape[3 - j, i];
+            }
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                block.Shape[i, j] = temp[i, j];
+            }
+        }
+    }
+
+    void BlockKeyDownHandller()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            ToggleGridActive(currentBlock, false);
+            currentBlock.Column--;
+            ToggleGridActive(currentBlock, true);
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            ToggleGridActive(currentBlock, false);
+            currentBlock.Column++;
+            ToggleGridActive(currentBlock, true);
+        }
+        if(Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            ToggleGridActive(currentBlock, false);
+            RotateGrid(currentBlock);
+            ToggleGridActive(currentBlock, true);
+        }
+        if(Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            ToggleGridActive(currentBlock, false);
+            currentBlock.Row--;
+            ToggleGridActive(currentBlock, true);
+        }
+    }
+
+    void AutoDrop()
+    {
+        timer += Time.deltaTime;
+        if (timer >= interval)
+        {
+            ToggleGridActive(currentBlock, false);
+            currentBlock.Row--;
+            ToggleGridActive(currentBlock, true);
+
+            timer = 0;
+        }
     }
 
     private void Update()
     {
-        timer += Time.deltaTime;
-        if(timer >= interval)
-        {
-            ClearField(currentBlock);
-            currentBlock.Row--;
-
-            RenderBlock(currentBlock);
-
-            timer = 0;
-        }
+        BlockKeyDownHandller();
+        AutoDrop();
     }
 }
