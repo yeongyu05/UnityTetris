@@ -1,22 +1,18 @@
 public class Block
 {
-    public bool[,] blocks = new bool[4, 4] {
-        { true, true, true, true },
-        { true, true, true, true },
-        { true, true, true, true },
-        { true, true, true, true },
+    public bool[,] I = new bool[5, 5] {
+        { false, false, true, false, false },
+        { false, false, true, false, false },
+        { false, false, true, false, false },
+        { false, false, true, false, false },
+        { false, false, false, false, false },
     };
-    public bool[,] I = new bool[4, 4] {
-        { false, false, false, false },
-        { true, true, true, true},
-        { false, false, false, false },
-        { false, false, false, false },
-    };
-    public bool[,] O = new bool[4, 4] {
-        { false, true, true, false },
-        { false, true, true, false },
-        { false, false, false, false },
-        { false, false, false, false },
+    public bool[,] O = new bool[5, 5] {
+        { false, true, true, false, false },
+        { false, true, true, false, false },
+        { false, false, false, false, false },
+        { false, false, false, false, false },
+        { false, false, false, false, false },
     };
 
     public int Column;

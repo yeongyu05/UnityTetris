@@ -14,7 +14,6 @@ public class Field : MonoBehaviour
     private Bounds bounds;
     private Bounds blockBounds;
     private GameObject[,] grid;
-    private bool[,] temp = new bool [4, 4];
 
     private int x = 4;
     private int y = 21;
@@ -85,39 +84,40 @@ public class Field : MonoBehaviour
 
     void ToggleGridActive(Block block, bool active)
     {
-        int blockY = 0;
+        int localY = 0;
 
-        for (int y = block.Row - 1; y < block.Row + 3; y++)
+        for (int worldY = block.Row - 2; worldY < block.Row + 3; worldY++)
         {
-            int blockX = 0;
-
-            for (int x = block.Column - 1; x < block.Column + 3; x++)
+            int localX = 0;
+            for (int worldX = block.Column - 2; worldX < block.Column + 3; worldX++)
             {
-                if (block.Shape[blockX, blockY])
+                if(block.Shape[localY, localX])
                 {
-                    grid[x, y].SetActive(active);
+                    grid[worldX, worldY].SetActive(active);
                 }
 
-                blockX++;
+                localX++;
             }
 
-            blockY++;
+            localY++;
         }
     }
 
     void RotateGrid(Block block)
     {
-        for (int i = 0; i < 4; i++)
+        bool[,] temp = new bool[5, 5];
+
+        for (int i = 0; i < 5; i++)
         {
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 5; j++)
             {
-                temp[i, j] = block.Shape[3 - j, i];
+                temp[i, j] = block.Shape[4 - j, i];
             }
         }
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 5; i++)
         {
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < 5; j++)
             {
                 block.Shape[i, j] = temp[i, j];
             }
@@ -128,12 +128,32 @@ public class Field : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
+            {
+            //    // (포지션 + 왼쪽 모양 수)가 0보다 작은지
+            //    int localY = 0;
+            //
+            //for (int worldY = currentBlock.Row - 2; worldY < currentBlock.Row + 3; worldY++)
+            //{
+            //int localX = 0;
+            //for (int worldX = currentBlock.Column - 2; worldX < currentBlock.Column + 3; worldX++)
+            //            {
+            // currentBlock.Shape[localY, localX]
+            //int a = currentBlock.Column + 
+            //
+            //localX++;
+            //}
+            //
+            //localY++;
+            //}
+            }
+
             ToggleGridActive(currentBlock, false);
             currentBlock.Column--;
             ToggleGridActive(currentBlock, true);
         }
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
+            // (포지션 + 오른쪽 모양 수)가 10보다 큰지
             ToggleGridActive(currentBlock, false);
             currentBlock.Column++;
             ToggleGridActive(currentBlock, true);
